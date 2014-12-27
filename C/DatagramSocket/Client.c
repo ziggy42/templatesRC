@@ -10,7 +10,7 @@
 #define MAX_LENGTH 256
 #define INSERT_INPUT "\nInsert Input"
 
-int isNumber(const char *s)
+void isNumber(const char *s)
 {
     while (*s) 
     	if (isdigit(*s++) == 0) 

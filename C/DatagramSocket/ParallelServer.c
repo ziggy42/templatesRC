@@ -17,7 +17,7 @@ void handler(int signo)
     wait(&stato);
 }
 
-int isNumber(const char *s)
+void isNumber(const char *s)
 {
     while (*s) 
     	if (isdigit(*s++) == 0) 
