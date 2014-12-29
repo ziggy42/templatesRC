@@ -8,7 +8,7 @@
 #include <string.h>
 
 #define MAX_LENGTH 256
-#define INSERT_INPUT "Insert Input"
+#define INSERT_INPUT "Insert Input: "
 
 void isNumber(const char *s)
 {
@@ -53,7 +53,7 @@ int main(int argc, char * argv[])
     servaddr.sin_addr.s_addr = ((struct in_addr *)(host->h_addr))->s_addr;
     servaddr.sin_port = htons(port);
 
-    printf("%s\n", INSERT_INPUT);
+    printf("%s", INSERT_INPUT);
     while(fgets(input, MAX_LENGTH, stdin) != NULL)
     {
 
@@ -77,7 +77,7 @@ int main(int argc, char * argv[])
         write(sd, input, strlen(input) + 1);
         shutdown(sd,1);
 
-        if((nread=read(sd,result,MAX_LENGTH)) < 0)
+        if((nread = read(sd, result, MAX_LENGTH)) < 0)
         {
             printf("ERROR receiving response\n");
             continue;
@@ -86,7 +86,7 @@ int main(int argc, char * argv[])
         close(sd);
 
         printf("Result: %s\n", result);
-        printf("%s\n", INSERT_INPUT);
+        printf("\n%s", INSERT_INPUT);
     }
 
     return 0;

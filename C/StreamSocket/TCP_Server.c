@@ -23,61 +23,61 @@ void handler(int signo)
 void isNumber(const char *s)
 {
     while (*s) 
-    	if (isdigit(*s++) == 0) 
-    	{
-    		printf("%s is not a number\n", s);
-    		exit(3);
-    	}
+        if (isdigit(*s++) == 0) 
+        {
+            printf("%s is not a number\n", s);
+            exit(3);
+        }
 }
 
 int main(int argc, char * argv[])
 {
-	struct sockaddr_in cliaddr, servaddr;
-  	struct hostent * clienthost;
-	int port, sd, len, listen_sd, nread;
-	char request[MAX_LENGTH];
-	const int on = 1;
+    struct sockaddr_in cliaddr, servaddr;
+    struct hostent * clienthost;
+    int port, sd, len, listen_sd, nread;
+    char request[MAX_LENGTH];
+    const int on = 1;
 
-	if(argc!=2)
-  	{
-    	printf("Error: %s port\n", argv[0]);
-    	exit(1);
-  	}
+    if(argc!=2)
+    {
+        printf("Error: %s port\n", argv[0]);
+        exit(1);
+    }
 
-  	isNumber(argv[1]);
-  	port = atoi(argv[1]);
-  	if (port < 1024 || port > 65535) 
-  	{
-  		printf("Port must be in [1024, 65535]\n");
-    	exit(4);
-	}
+    isNumber(argv[1]);
+    port = atoi(argv[1]);
+    if (port < 1024 || port > 65535) 
+    {
+        printf("Port must be in [1024, 65535]\n");
+        exit(4);
+    }
 
     signal(SIGCHLD, handler);
 
-	memset ((char *) &servaddr, 0, sizeof(servaddr));
-  	servaddr.sin_family = AF_INET;
-  	servaddr.sin_addr.s_addr = INADDR_ANY;  
-  	servaddr.sin_port = htons(port);
+    memset ((char *) &servaddr, 0, sizeof(servaddr));
+    servaddr.sin_family = AF_INET;
+    servaddr.sin_addr.s_addr = INADDR_ANY;  
+    servaddr.sin_port = htons(port);
 
-  	listen_sd = socket(AF_INET, SOCK_STREAM, 0);
-  	if(listen_sd <0)
-  	{
-  		perror("listen socket creation"); 
-  		exit(1);
-  	}
-  	printf("Server: listen socket created: sd=%d\n", listen_sd);
+    listen_sd = socket(AF_INET, SOCK_STREAM, 0);
+    if(listen_sd <0)
+    {
+        perror("listen socket creation"); 
+        exit(1);
+    }
+    printf("Server: listen socket created: sd=%d\n", listen_sd);
 
-  	if(setsockopt(listen_sd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on))<0)
-  	{
-  		perror("set socket options "); 
-  		exit(1);
-  	}
-  	printf("Server: set socket options ok\n");
+    if(setsockopt(listen_sd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on))<0)
+    {
+        perror("set socket options "); 
+        exit(1);
+    }
+    printf("Server: set socket options ok\n");
 
-  	if(bind(listen_sd,(struct sockaddr *) &servaddr, sizeof(servaddr))<0)
+    if(bind(listen_sd,(struct sockaddr *) &servaddr, sizeof(servaddr))<0)
   	{
-  		perror("bind socket "); 
-  		exit(1);
+        perror("bind socket "); 
+        exit(1);
   	}
  	printf("Server: bind socket ok\n");
 
@@ -88,9 +88,9 @@ int main(int argc, char * argv[])
     }
     printf("Server: listen ok\n");
 
- 	for (;;)
- 	{
- 		len = sizeof(cliaddr);
+    for (;;)
+    {
+        len = sizeof(cliaddr);
         if((sd=accept(listen_sd,(struct sockaddr *)&cliaddr,&len))<0)
         {
             if (errno==EINTR)
@@ -122,6 +122,7 @@ int main(int argc, char * argv[])
             shutdown(sd,1);
 
             close(sd);
+            exit(0);
         }
 
         close(sd);

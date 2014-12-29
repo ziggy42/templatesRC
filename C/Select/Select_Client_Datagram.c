@@ -8,7 +8,7 @@
 #include <string.h>
 
 #define MAX_LENGTH 256
-#define INSERT_INPUT "\nInsert Input"
+#define INSERT_INPUT "\nInsert Input: "
 
 void isNumber(const char *s)
 {
@@ -74,7 +74,7 @@ int main(int argc, char * argv[])
     }
     printf("Bind socket ok, port: %i\n", clientaddr.sin_port);
 
-    printf("%s\n", INSERT_INPUT);
+    printf("%s", INSERT_INPUT);
     while(fgets(input, MAX_LENGTH, stdin) != NULL)
     {
 
@@ -98,7 +98,7 @@ int main(int argc, char * argv[])
 
         printf("Result: %s\n", result);
 
-        printf("%s\n", INSERT_INPUT);
+        printf("%s", INSERT_INPUT);
     }
 
     close(sd);
