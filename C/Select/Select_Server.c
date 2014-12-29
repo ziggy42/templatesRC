@@ -15,11 +15,13 @@
 #define MAX_LENGTH 256
 #define max(a,b) ((a) > (b) ? (a) : (b))
 
+
 void handler(int signo)
 {
     int stato;
     wait(&stato);
 }
+
 
 void isNumber(const char *s)
 {
@@ -30,6 +32,7 @@ void isNumber(const char *s)
             exit(2);
         }
 }
+
 
 int main(int argc, char const *argv[])
 {
@@ -141,7 +144,7 @@ int main(int argc, char const *argv[])
                 continue;
             }
 
-            if (sendto(datagramsd, &request, sizeof(request), 0, (struct sockaddr *)&cliaddr, len)<0)
+            if (sendto(datagramsd, &request, sizeof(request), 0, (struct sockaddr *) &cliaddr, len)<0)
             {
                 perror("sendto "); 
                 continue;
@@ -181,7 +184,7 @@ int main(int argc, char const *argv[])
 
                 printf("Request: %s\n", request);
 
-                if ((nwrite = write(connsd, request, MAX_LENGTH))<0 )
+                if ((nwrite = write(connsd, request, strlen(request) + 1))<0 )
                 {
                     perror("ERROR writing response");
                     exit(13);

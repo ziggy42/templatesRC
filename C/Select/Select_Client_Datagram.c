@@ -10,6 +10,7 @@
 #define MAX_LENGTH 256
 #define INSERT_INPUT "\nInsert Input: "
 
+
 void isNumber(const char *s)
 {
   while (*s) 
@@ -90,7 +91,6 @@ int main(int argc, char * argv[])
 
         printf("Waiting for result...\n");
         if (recvfrom(sd, result, sizeof(result), 0, (struct sockaddr *) &servaddr, &len)<0) 
-        // NB: len is the same
         {
           perror("recvfrom"); 
           continue;

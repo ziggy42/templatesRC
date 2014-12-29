@@ -10,6 +10,7 @@
 #define MAX_LENGTH 256
 #define INSERT_INPUT "Insert Input: "
 
+
 void isNumber(const char *s)
 {
     while (*s) 
@@ -19,6 +20,7 @@ void isNumber(const char *s)
             exit(3);
         }
 }
+
 
 int main(int argc, char * argv[])
 {
