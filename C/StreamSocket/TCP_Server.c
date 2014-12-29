@@ -75,11 +75,11 @@ int main(int argc, char * argv[])
     printf("Server: set socket options ok\n");
 
     if(bind(listen_sd,(struct sockaddr *) &servaddr, sizeof(servaddr))<0)
-  	{
+    {
         perror("bind socket "); 
         exit(1);
-  	}
- 	printf("Server: bind socket ok\n");
+    }
+    printf("Server: bind socket ok\n");
 
     if (listen(listen_sd, 5) < 0)
     {
@@ -128,5 +128,5 @@ int main(int argc, char * argv[])
         close(sd);
     }
 
-	return 0;
+    return 0;
 }
