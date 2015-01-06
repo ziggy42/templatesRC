@@ -1,18 +1,18 @@
 package server;
 
-import interf.RemoteInterface;
+import interf.RMI_interfaceFile;
 
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
-public class RemoteServer extends UnicastRemoteObject implements
-		RemoteInterface {
+public class RMI_Server extends UnicastRemoteObject implements
+		RMI_interfaceFile {
 
 	private static final long serialVersionUID = 1L;
 
-	protected RemoteServer() throws RemoteException {
+	protected RMI_Server() throws RemoteException {
 		super();
 	}
 
@@ -27,7 +27,7 @@ public class RemoteServer extends UnicastRemoteObject implements
 		String registryHost = "localhost", serviceName = "ServiceName";
 
 		try {
-			RemoteServer rmServer = new RemoteServer();
+			RMI_Server rmServer = new RMI_Server();
 			Naming.rebind("//" + registryHost + ":" + REGISTRYPORT + "/"
 					+ serviceName, rmServer);
 		} catch (RemoteException | MalformedURLException e) {

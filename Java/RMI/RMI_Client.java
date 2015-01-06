@@ -1,13 +1,13 @@
 package client;
 
-import interf.RemoteInterface;
+import interf.RMI_interfaceFile;
 
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
-public class Client {
+public class RMI_Client {
 
 	public static void main(String[] args) {
 
@@ -21,7 +21,7 @@ public class Client {
 		registryHost = args[0];
 
 		try {
-			RemoteInterface rmObj = (RemoteInterface) Naming.lookup("rmi://"
+			RMI_interfaceFile rmObj = (RMI_interfaceFile) Naming.lookup("rmi://"
 					+ registryHost + ":" + REGISTRYPORT + "/" + serviceName);
 			System.out.println("Result: " + rmObj.rmiMethod("Some input"));
 		} catch (MalformedURLException | RemoteException | NotBoundException e) {
