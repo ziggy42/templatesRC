@@ -1,0 +1,5 @@
+program ECHOPROG {
+	version ECHOVERS {
+		string echo(string) = 1;
+	} = 1;
+} = 0x20000013;

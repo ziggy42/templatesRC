@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
 
 	server = argv[1];
 
-	cl = clnt_create(server, MYPROG, MYVERS, "udp");
+	cl = clnt_create(server, ECHOPROG, ECHOVERS, "udp");
 	if (cl == NULL) 
 	{
 		clnt_pcreateerror(server);

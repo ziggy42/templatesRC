@@ -3,7 +3,7 @@
 #include <string.h>
 #include "echo.h"
 
-char ** procedure_1_svc(char ** msg, struct svc_req * rp)
+char ** echo_1_svc(char ** msg, struct svc_req * rp)
 {
 	static char * echo_msg;
 
