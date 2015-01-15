@@ -6,18 +6,19 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <string.h>
+#include <ctype.h>
 
 #define MAX_LENGTH 256
-#define INSERT_INPUT "\nInsert Input"
+#define INSERT_INPUT "\nInsert Input: "
+#define USAGE "Usage: client serverAddress serverPort"
 
-void isNumber(const char *s)
+
+int isNumber(const char *s)
 {
-  while (*s) 
-    if (isdigit(*s++) == 0) 
-    {
-        printf("%s is not a number\n", s);
-        exit(3);
-    }
+    while(*s)
+        if (isdigit(*s++) == 0)
+            return 0;
+    return 1;
 }
 
 
@@ -30,7 +31,7 @@ int main(int argc, char * argv[])
 
     if(argc!=3)
     {
-        printf("Error:%s serverAddress serverPort\n", argv[0]);
+        printf("%s\n", USAGE);
         exit(1);
     }
 
@@ -41,7 +42,13 @@ int main(int argc, char * argv[])
         exit(2);
     }
 
-    isNumber(argv[2]);
+    if (!isNumber(argv[2]))
+    {
+        printf("%s\n", USAGE);
+        printf("%s is not a number\n", argv[2]);
+        exit(3);
+    }
+
     port = atoi(argv[2]);
     if (port < 1024 || port > 65535) 
     {
@@ -74,7 +81,7 @@ int main(int argc, char * argv[])
     }
     printf("Bind socket ok, port: %i\n", clientaddr.sin_port);
 
-    printf("%s\n", INSERT_INPUT);
+    printf("%s", INSERT_INPUT);
     while(fgets(input, MAX_LENGTH, stdin) != NULL)
     {
 
@@ -84,21 +91,20 @@ int main(int argc, char * argv[])
         len=sizeof(servaddr);
         if(sendto(sd, input, sizeof(input), 0, (struct sockaddr * ) &servaddr, len)<0)
         {
-       		perror("sendto");
-          continue;
+            perror("sendto");
+            continue;
         }
 
         printf("Waiting for result...\n");
         if (recvfrom(sd, result, sizeof(result), 0, (struct sockaddr *) &servaddr, &len)<0) 
-        // NB: len is the same
         {
-          perror("recvfrom"); 
-          continue;
+            perror("recvfrom"); 
+            continue;
         }
 
         printf("Result: %s\n", result);
 
-        printf("%s\n", INSERT_INPUT);
+        printf("%s", INSERT_INPUT);
     }
 
     close(sd);

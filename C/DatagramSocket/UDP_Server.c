@@ -3,29 +3,33 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/wait.h>
+#include <ctype.h>
 #include <netinet/in.h>
 #include <netdb.h>
 #include <signal.h>
 #include <string.h>
 
 #define MAX_LENGTH 256
+#define USAGE "Usage: server serverPort"
+
 
 void handler(int signo)
 {
     printf("SIGCHLD handler\n");
-    int stato;
-    wait(&stato);
+    int state;
+    wait(&state);
 }
 
-void isNumber(const char *s)
+
+int isNumber(const char *s)
 {
-    while (*s) 
-        if (isdigit(*s++) == 0) 
-        {
-            printf("%s is not a number\n", s);
-            exit(3);
-        }
+    while(*s)
+        if (isdigit(*s++) == 0)
+            return 0;
+    return 1;
 }
+
 
 int main(int argc, char * argv[])
 {
@@ -37,11 +41,17 @@ int main(int argc, char * argv[])
 
     if(argc!=2)
     {
-        printf("Error: %s port\n", argv[0]);
+        printf("%s\n", USAGE);
         exit(1);
     }
 
-    isNumber(argv[1]);
+    if (!isNumber(argv[1]))
+    {
+        printf("%s\n", USAGE);
+        printf("%s is not a number\n", argv[1]);
+        exit(3);
+    }
+
     port = atoi(argv[1]);
     if (port < 1024 || port > 65535) 
     {
@@ -89,7 +99,7 @@ int main(int argc, char * argv[])
 
         if (fork() == 0)
         {
-            printf("Child %d created\n", getpid());
+            printf("\nChild %d created\n", getpid());
             clienthost = gethostbyaddr( (char *) &cliaddr.sin_addr, sizeof(cliaddr.sin_addr), AF_INET);
             if (clienthost == NULL) 
                 printf("client host information not found\n");
@@ -101,7 +111,7 @@ int main(int argc, char * argv[])
                 perror("sendto "); 
                 continue;
             } else {
-                printf("%d: Response sent\n\n", getpid());
+                printf("%d: Response sent\n", getpid());
             }
 
             exit(0);
