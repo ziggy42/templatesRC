@@ -1,4 +1,4 @@
-package com.andreapivetta.client;
+package client;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
@@ -8,14 +8,15 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-public class Client {
+public class TCP_Client {
 
+	private static final boolean DEBUG = true;
 	private static final int ARGC = 2;
-	private static final String USAGE = "java MyName ip port";
+	private static final String USAGE = "USAGE: java Client ip port";
 	private static final String IN_MESSAGE = "Insert query: ";
-	private static final String PORT_MESSAGE = "Port must be in [1024, 65535";
+	private static final String PORT_MESSAGE = "Port must be in [1024, 65535]";
 
-	public static void main(String[] args) {
+	public static void main(String args[]) {
 		if (args.length != ARGC) {
 			System.out.println(USAGE);
 			System.exit(1);
@@ -26,6 +27,7 @@ public class Client {
 			port = Integer.parseInt(args[1]);
 		} catch (NumberFormatException e) {
 			System.out.println(USAGE);
+			System.out.println("Port must be integer");
 			System.exit(1);
 		}
 
@@ -34,31 +36,50 @@ public class Client {
 			System.exit(1);
 		}
 
-		String query;
-		DataOutputStream out;
-		DataInputStream in;
-		
+		Socket socket = null;
 		try {
-			Socket socket = new Socket(args[0], port);
-			BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
-			System.out.println(IN_MESSAGE);
+			socket = new Socket(args[0], port);
+		} catch (UnknownHostException e) {
+			if (DEBUG)
+				e.printStackTrace();
+
+			System.out.println("Error creating socket: unknown host");
+			System.exit(1);
+		} catch (IOException e) {
+			if (DEBUG)
+				e.printStackTrace();
+
+			System.out.println("Error creating socket");
+			System.exit(1);
+		}
+
+		String query;
+		DataOutputStream out = null;
+		DataInputStream in = null;
+		try {
+			in = new DataInputStream(socket.getInputStream());
+			out = new DataOutputStream(socket.getOutputStream());
+		} catch (IOException e) {
+			if (DEBUG)
+				e.printStackTrace();
+
+			System.out.println("Error creating data stream");
+			System.exit(1);
+		}
+
+		try {
+			BufferedReader stdIn = new BufferedReader(new InputStreamReader(
+					System.in));
+			System.out.print(IN_MESSAGE);
 			while ((query = stdIn.readLine()) != null) {
-				socket = new Socket(args[0], port);
-				out = new DataOutputStream(socket.getOutputStream());
-				in = new DataInputStream(socket.getInputStream());
-				
 				out.writeUTF(query);
-				System.out.println("ANSWER: " + in.readUTF() + "\n"
-						+ IN_MESSAGE);
+				System.out.println("ANSWER: " + in.readUTF());
+				System.out.print("\n" + IN_MESSAGE);
 			}
 			socket.close();
-		} catch (UnknownHostException e) {
-			System.out.println("Server not found");
-			System.exit(1);
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.out.println("Ops: IOException");
-			System.exit(1);
 		}
 
 	}
