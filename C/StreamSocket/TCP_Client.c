@@ -6,19 +6,21 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <string.h>
+#include <ctype.h>
 
 #define MAX_LENGTH 256
-#define INSERT_INPUT "Insert Input"
+#define INSERT_INPUT "Insert Input: "
+#define USAGE "Usage: client serverAddress serverPort"
 
-void isNumber(const char *s)
+
+int isNumber(const char *s)
 {
-    while (*s) 
-        if (isdigit(*s++) == 0) 
-        {
-            printf("%s is not a number\n", s);
-            exit(3);
-        }
+    while(*s)
+        if (isdigit(*s++) == 0)
+            return 0;
+    return 1;
 }
+
 
 int main(int argc, char * argv[])
 {
@@ -40,7 +42,13 @@ int main(int argc, char * argv[])
         exit(2);
     }
 
-    isNumber(argv[2]);
+    if (!isNumber(argv[2]))
+    {
+        printf("%s\n", USAGE);
+        printf("%s is not a number\n", argv[2]);
+        exit(3);
+    }
+
     port = atoi(argv[2]);
     if (port < 1024 || port > 65535) 
     {
@@ -53,7 +61,7 @@ int main(int argc, char * argv[])
     servaddr.sin_addr.s_addr = ((struct in_addr *)(host->h_addr))->s_addr;
     servaddr.sin_port = htons(port);
 
-    printf("%s\n", INSERT_INPUT);
+    printf("\n%s", INSERT_INPUT);
     while(fgets(input, MAX_LENGTH, stdin) != NULL)
     {
 
@@ -86,7 +94,7 @@ int main(int argc, char * argv[])
         close(sd);
 
         printf("Result: %s\n", result);
-        printf("%s\n", INSERT_INPUT);
+        printf("\n%s", INSERT_INPUT);
     }
 
     return 0;

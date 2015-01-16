@@ -11,8 +11,11 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
+#include <ctype.h>
 
 #define MAX_LENGTH 256
+#define USAGE "Usage: server serverPort"
+
 
 void handler(int signo)
 {
@@ -20,15 +23,15 @@ void handler(int signo)
     wait(&stato);
 }
 
-void isNumber(const char *s)
+
+int isNumber(const char *s)
 {
-    while (*s) 
-        if (isdigit(*s++) == 0) 
-        {
-            printf("%s is not a number\n", s);
-            exit(3);
-        }
+    while(*s)
+        if (isdigit(*s++) == 0)
+            return 0;
+    return 1;
 }
+
 
 int main(int argc, char * argv[])
 {
@@ -44,7 +47,13 @@ int main(int argc, char * argv[])
         exit(1);
     }
 
-    isNumber(argv[1]);
+    if (!isNumber(argv[1]))
+    {
+        printf("%s\n", USAGE);
+        printf("%s is not a number\n", argv[2]);
+        exit(3);
+    }
+
     port = atoi(argv[1]);
     if (port < 1024 || port > 65535) 
     {
@@ -111,7 +120,7 @@ int main(int argc, char * argv[])
             else 
                 printf("Request received from: %s %i\n", clienthost->h_name, (unsigned)ntohs(cliaddr.sin_port));
 
-            if(nread = read(sd, request, MAX_LENGTH) < 0)
+            if((nread = read(sd, request, MAX_LENGTH)) < 0)
             {
                 printf("ERROR receiving request\n");
             }
