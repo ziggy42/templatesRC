@@ -11,9 +11,11 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
+#include <ctype.h>
 
 #define MAX_LENGTH 256
 #define max(a,b) ((a) > (b) ? (a) : (b))
+#define USAGE "Usage: server serverPort"
 
 
 void handler(int signo)
@@ -23,33 +25,37 @@ void handler(int signo)
 }
 
 
-void isNumber(const char *s)
+int isNumber(const char *s)
 {
-    while (*s) 
-        if (isdigit(*s++) == 0) 
-        {
-            printf("%s is not a number\n", s);
-            exit(2);
-        }
+    while(*s)
+        if (isdigit(*s++) == 0)
+            return 0;
+    return 1;
 }
 
 
 int main(int argc, char const *argv[])
 {
     struct sockaddr_in cliaddr, servaddr;
-    struct hostent * clienthost;
-    int port, listen_sd, connsd, datagramsd, maxfdp, nready, len, nread, nwrite;
+    int port, listen_sd, connsd, datagramsd, maxfdp, nready, len, readRes;
     fd_set rset;
-    char request[MAX_LENGTH];
+    char request[MAX_LENGTH], endChar = '\0';
     const int on = 1;
+
 
     if(argc!=2)
     {
-        printf("Error: %s port\n", argv[0]);
+        printf("%s\n", USAGE);
         exit(1);
     }
 
-    isNumber(argv[1]);
+    if (!isNumber(argv[1]))
+    {
+        printf("%s\n", USAGE);
+        printf("%s is not a number\n", argv[2]);
+        exit(3);
+    }
+
     port = atoi(argv[1]);
     if (port < 1024 || port > 65535) 
     {
@@ -138,13 +144,17 @@ int main(int argc, char const *argv[])
         {
             printf("\nUDP request\n");
             len = sizeof(struct sockaddr_in);
-            if (recvfrom(datagramsd, request, sizeof(request), 0, (struct sockaddr *) &cliaddr, &len)<0)
+            if (recvfrom(datagramsd, request, sizeof(request), 0, 
+                (struct sockaddr *) &cliaddr, &len) < 0)
             {
                 perror("recvfrom "); 
                 continue;
             }
 
-            if (sendto(datagramsd, &request, sizeof(request), 0, (struct sockaddr *) &cliaddr, len)<0)
+            printf("Request: %s\n", request);
+
+            if (sendto(datagramsd, request, sizeof(request), 0, 
+                (struct sockaddr *) &cliaddr, len) < 0)
             {
                 perror("sendto "); 
                 continue;
@@ -170,27 +180,24 @@ int main(int argc, char const *argv[])
             {
                 close(listen_sd);
                 printf("\nTCP request: Child %d created\n", getpid());
-                clienthost = gethostbyaddr( (char *) &cliaddr.sin_addr, sizeof(cliaddr.sin_addr), AF_INET);
-                if (clienthost == NULL) 
-                    printf("client host information not found\n");
-                else 
-                    printf("Request received from: %s %i\n", clienthost->h_name, (unsigned)ntohs(cliaddr.sin_port));
 
-                if(nread = read(connsd, request, MAX_LENGTH) < 0)
+                for(;;)
                 {
-                    printf("ERROR receiving request\n");
-                    exit(12);
+                    if ((readRes = read(connsd, &request, sizeof(request))) < 0)
+                    { 
+                        perror("read"); 
+                        break; 
+                    } else if( readRes==0)
+                    { 
+                        printf("EOF\n"); 
+                        break; 
+                    }
+
+                    printf("Request: %s\n", request);
+                    write(connsd, request, strlen(request) + 1);
+                    write(connsd, &endChar, sizeof(char));
+                    printf("Response sent...\n");
                 }
-
-                printf("Request: %s\n", request);
-
-                if ((nwrite = write(connsd, request, strlen(request) + 1))<0 )
-                {
-                    perror("ERROR writing response");
-                    exit(13);
-                }
-
-                printf("Response sent...\n");
 
                 close(connsd);
                 exit(0);

@@ -6,19 +6,20 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <string.h>
+#include <fcntl.h>
+#include <ctype.h>
 
 #define MAX_LENGTH 256
 #define INSERT_INPUT "Insert Input: "
+#define USAGE "Usage: client serverAddress serverPort"
 
 
-void isNumber(const char *s)
+int isNumber(const char *s)
 {
-    while (*s) 
-        if (isdigit(*s++) == 0) 
-        {
-            printf("%s is not a number\n", s);
-            exit(3);
-        }
+    while(*s)
+        if (isdigit(*s++) == 0)
+            return 0;
+    return 1;
 }
 
 
@@ -27,11 +28,11 @@ int main(int argc, char * argv[])
     struct hostent *host;
     struct sockaddr_in servaddr;
     int port, sd, nread;
-    char input[MAX_LENGTH], result[MAX_LENGTH];
+    char input[MAX_LENGTH], c;
 
     if(argc!=3)
     {
-        printf("Error:%s serverAddress serverPort\n", argv[0]);
+        printf("%s\n", USAGE);
         exit(1);
     }
 
@@ -42,7 +43,13 @@ int main(int argc, char * argv[])
         exit(2);
     }
 
-    isNumber(argv[2]);
+    if (!isNumber(argv[2]))
+    {
+        printf("%s\n", USAGE);
+        printf("%s is not a number\n", argv[2]);
+        exit(3);
+    }
+
     port = atoi(argv[2]);
     if (port < 1024 || port > 65535) 
     {
@@ -55,41 +62,40 @@ int main(int argc, char * argv[])
     servaddr.sin_addr.s_addr = ((struct in_addr *)(host->h_addr))->s_addr;
     servaddr.sin_port = htons(port);
 
+    sd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sd < 0)
+    {
+        perror("Opening Socket"); 
+        exit(1);
+    }
+    printf("Socket created: sd=%d\n", sd);
+
+    if(connect(sd,(struct sockaddr *) &servaddr, sizeof(struct sockaddr))<0)
+    {    
+        perror("connect"); 
+        exit(1);
+    }
+
     printf("%s", INSERT_INPUT);
     while(fgets(input, MAX_LENGTH, stdin) != NULL)
     {
-
         if (input[strlen(input) - 1] == '\n')
-            input[strlen(input) - 1] = '\0';
-
-        sd = socket(AF_INET, SOCK_STREAM, 0);
-        if (sd < 0)
-        {
-            perror("Opening Socket"); 
-            exit(1);
-        }
-        printf("Socket created: sd=%d\n", sd);
-
-        if(connect(sd,(struct sockaddr *) &servaddr, sizeof(struct sockaddr))<0)
-        {    
-            perror("connect"); 
-            exit(1);
-        } 
+            input[strlen(input) - 1] = '\0'; 
 
         write(sd, input, strlen(input) + 1);
-        shutdown(sd,1);
 
-        if((nread = read(sd, result, MAX_LENGTH)) < 0)
+        while((nread = read(sd, &c, sizeof(char))) > 0)
         {
-            printf("ERROR receiving response\n");
-            continue;
+            if (c == '\0')
+                break;
+
+            write(1, &c, sizeof(char));
         }
 
-        close(sd);
-
-        printf("Result: %s\n", result);
+        printf("\nDONE\n");
         printf("\n%s", INSERT_INPUT);
     }
 
+    close(sd);
     return 0;
 }
