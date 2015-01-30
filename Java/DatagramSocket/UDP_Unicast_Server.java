@@ -1,5 +1,3 @@
-package com.andreapivetta.server;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -9,7 +7,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 
-public class ServerMain {
+public class UDP_Unicast_Server {
 
 	private static final int ARGC = 1;
 	private static final String USAGE = "java MyName port";

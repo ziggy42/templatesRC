@@ -1,5 +1,3 @@
-package server;
-
 import interf.RMI_interfaceFile;
 
 import java.net.MalformedURLException;

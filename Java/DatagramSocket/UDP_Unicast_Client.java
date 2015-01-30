@@ -1,5 +1,3 @@
-package com.andreapivetta.client;
-
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -13,7 +11,7 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
-public class ClientMain {
+public class UDP_Unicast_Client {
 
 	private static final int ARGC = 2;
 	private static final String USAGE = "java MyName ip port";
